@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import type { CalculatorItem } from '../data/items';
+import { assetUrl } from '../lib/assetUrl';
 
 interface ItemCardProps {
   item: CalculatorItem;
@@ -12,7 +13,7 @@ export default function ItemCard({ item }: ItemCardProps) {
     <article className="item-card">
       {item.image && (
         <img
-          src={item.image}
+          src={assetUrl(item.image ?? '')}
           alt={item.title}
           className="item-card-image"
         />

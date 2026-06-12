@@ -10,7 +10,7 @@ export const CALCULATOR_ITEMS: CalculatorItem[] = [
     id: 'mixing-tank',
     title: 'Mixing Tank',
     description: 'All type of mixing equipment tank calculator',
-    image: '/mixing-tank.png',
+    image: 'mixing-tank.png',
   },
 ];
 

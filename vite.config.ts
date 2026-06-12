@@ -1,8 +1,20 @@
-import { defineConfig } from 'vite';
+import { copyFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { defineConfig, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
 const base = process.env.BASE_PATH || '/';
+
+function copy404Plugin(): Plugin {
+  return {
+    name: 'copy-404-for-github-pages',
+    closeBundle() {
+      const dist = join(__dirname, 'dist');
+      copyFileSync(join(dist, 'index.html'), join(dist, '404.html'));
+    },
+  };
+}
 
 export default defineConfig({
   base,
@@ -15,7 +27,7 @@ export default defineConfig({
       },
       includeAssets: ['logo.png', 'mixing-tank.png', 'favicon-32.png'],
       manifest: {
-        id: '/',
+        id: base,
         name: 'JP Sons Engineering',
         short_name: 'JP Sons',
         description: 'Mixing tank calculator by JP Sons Engineering',
@@ -23,8 +35,8 @@ export default defineConfig({
         background_color: '#ffffff',
         display: 'standalone',
         orientation: 'portrait',
-        scope: '/',
-        start_url: '/',
+        scope: base,
+        start_url: base,
         categories: ['business', 'productivity'],
         icons: [
           {
@@ -53,5 +65,6 @@ export default defineConfig({
         navigateFallbackDenylist: [/^\/api/],
       },
     }),
+    copy404Plugin(),
   ],
 });

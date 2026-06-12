@@ -1,5 +1,6 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { assetUrl } from './assetUrl';
 import type { ComponentParams, LegParams, LineItemResult } from './mixingTankCalculations';
 import { formatCurrency, formatNum } from './mixingTankCalculations';
 
@@ -70,7 +71,7 @@ export async function generateCalculatorPdf(data: CalculatorPdfData): Promise<vo
   const pageWidth = doc.internal.pageSize.getWidth();
   let y = 14;
 
-  const logoData = await loadImageDataUrl('/logo.png');
+  const logoData = await loadImageDataUrl(assetUrl('logo.png'));
   if (logoData) {
     doc.addImage(logoData, 'PNG', 14, y, 36, 36);
   }
