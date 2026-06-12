@@ -51,7 +51,7 @@ export function calcShell(d: number, h: number, thk: number): number {
 }
 
 export function calcFlatDishCone(d: number, thk: number): number {
-  return ((d + 100) * (d + 100) * thk) / 160000;
+  return (d + 100) * (d + 100) * thk * 0.000008;
 }
 
 export function calcTopRing(d: number, ringW: number, ringThk: number): number {
@@ -95,7 +95,7 @@ export function calculateLineItems(
 
   const items: Array<Omit<LineItemResult, 'rate' | 'totalAmount'>> = [
     { id: 'shell', name: 'SHELL', result: calcShell(d, h, thk) },
-    { id: 'bottom', name: 'BOTTOM', result: calcFlatDishCone(d, thk) },
+    { id: 'bottom', name: 'FLAT/DISH/CONE', result: calcFlatDishCone(d, thk) },
     { id: 'top', name: 'TOP (FLAT/DISH)', result: calcFlatDishCone(d, topThickness) },
     {
       id: 'topRing',

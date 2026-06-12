@@ -71,35 +71,32 @@ export async function generateCalculatorPdf(data: CalculatorPdfData): Promise<vo
   const pageWidth = doc.internal.pageSize.getWidth();
   let y = 14;
 
-  const logoData = await loadImageDataUrl(assetUrl('logo.png'));
-  if (logoData) {
-    doc.addImage(logoData, 'PNG', 14, y, 36, 36);
-  }
-
-  doc.setFontSize(16);
-  doc.setTextColor(46, 93, 167);
-  doc.text('JP Sons Engineering', logoData ? 54 : 14, y + 8);
-
-  doc.setFontSize(11);
-  doc.setTextColor(80, 80, 80);
-  doc.text(data.itemTitle + ' — Calculation Sheet', logoData ? 54 : 14, y + 15);
-
   const dateStr = new Date().toLocaleDateString('en-IN', {
     day: '2-digit',
     month: 'short',
     year: 'numeric',
   });
   doc.setFontSize(9);
-  doc.text(`Date: ${dateStr}`, pageWidth - 14, y + 8, { align: 'right' });
+  doc.setTextColor(80, 80, 80);
+  doc.text(`Date: ${dateStr}`, pageWidth - 14, y, { align: 'right' });
 
-  y = logoData ? 52 : 28;
+  const logoData = await loadImageDataUrl(assetUrl('logo.png'));
+  const logoWidth = 48;
+  const logoHeight = 48;
+  if (logoData) {
+    const logoX = (pageWidth - logoWidth) / 2;
+    doc.addImage(logoData, 'PNG', logoX, y + 4, logoWidth, logoHeight);
+    y += logoHeight + 10;
+  }
+
+  doc.setFontSize(12);
+  doc.setTextColor(46, 93, 167);
+  doc.setFont('helvetica', 'bold');
+  doc.text(data.itemTitle, pageWidth / 2, y, { align: 'center' });
+  y += 8;
 
   doc.setFontSize(10);
   doc.setTextColor(30, 30, 30);
-  doc.setFont('helvetica', 'bold');
-  doc.text('Tank Inputs', 14, y);
-  y += 6;
-
   doc.setFont('helvetica', 'normal');
   const inputs = [
     `LTR: ${data.ltr} L`,
