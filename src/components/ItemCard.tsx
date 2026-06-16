@@ -12,11 +12,13 @@ export default function ItemCard({ item }: ItemCardProps) {
   return (
     <article className="item-card">
       {item.image && (
-        <img
-          src={assetUrl(item.image ?? '')}
-          alt={item.title}
-          className="item-card-image"
-        />
+        <div className="item-card-visual">
+          <img
+            src={assetUrl(item.image ?? '')}
+            alt={item.title}
+            className="item-card-image"
+          />
+        </div>
       )}
       <div className="item-info">
         <h2>{item.title}</h2>
@@ -27,7 +29,8 @@ export default function ItemCard({ item }: ItemCardProps) {
         className="btn-calculate"
         onClick={() => navigate(`/calculator/${item.id}`)}
       >
-        Calculate
+        <span>Open Calculator</span>
+        <span className="btn-calculate-arrow" aria-hidden="true">→</span>
       </button>
     </article>
   );

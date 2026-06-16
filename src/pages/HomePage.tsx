@@ -6,12 +6,20 @@ import { CALCULATOR_ITEMS } from '../data/items';
 export default function HomePage() {
   return (
     <div className="app home-page">
-      <CompanyLogo />
+      <header className="home-hero">
+        <CompanyLogo />
+        <p className="home-tagline">
+          Professional mixing equipment calculators for material weight and costing
+        </p>
+      </header>
 
       <InstallPrompt />
 
-      <section className="item-list">
-        <h2 className="section-title">Equipment</h2>
+      <section className="home-equipment" aria-labelledby="equipment-heading">
+        <div className="section-header">
+          <h2 id="equipment-heading">Equipment Calculators</h2>
+          <p>Select a tank type to estimate weight, material rate, and total cost</p>
+        </div>
         <ul className="item-list-items">
           {CALCULATOR_ITEMS.map((item) => (
             <li key={item.id}>
@@ -21,8 +29,8 @@ export default function HomePage() {
         </ul>
       </section>
 
-      <footer className="footer">
-        <p>Works offline after install. Use Chrome on Android or Safari on iPhone to add to home screen.</p>
+      <footer className="home-footer">
+        <p>Install on your device for quick access and offline use.</p>
       </footer>
     </div>
   );

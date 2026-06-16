@@ -12,6 +12,12 @@ export const CALCULATOR_ITEMS: CalculatorItem[] = [
     description: 'All type of mixing equipment tank calculator',
     image: 'mixing-tank.png',
   },
+  {
+    id: 'jacketed-mixing-tank',
+    title: 'Jacketed Mixing Tank',
+    description: 'Jacketed mixing tank with insulation calculator',
+    image: 'mixing-tank.png',
+  },
 ];
 
 export function getItemById(id: string): CalculatorItem | undefined {

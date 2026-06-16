@@ -4,8 +4,6 @@ import { defineConfig, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
-const base = process.env.BASE_PATH || '/';
-
 function copy404Plugin(): Plugin {
   return {
     name: 'copy-404-for-github-pages',
@@ -16,14 +14,18 @@ function copy404Plugin(): Plugin {
   };
 }
 
-export default defineConfig({
+export default defineConfig(({ mode }) => {
+  const base =
+    mode === 'production' && process.env.BASE_PATH ? process.env.BASE_PATH : '/';
+
+  return {
   base,
   plugins: [
     react(),
     VitePWA({
       registerType: 'autoUpdate',
       devOptions: {
-        enabled: true,
+        enabled: false,
       },
       includeAssets: ['logo.png', 'mixing-tank.png', 'favicon-32.png'],
       manifest: {
@@ -67,4 +69,5 @@ export default defineConfig({
     }),
     copy404Plugin(),
   ],
+  };
 });
