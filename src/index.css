@@ -418,6 +418,9 @@ body {
   border-radius: var(--radius);
   padding: 1.25rem;
   box-shadow: 0 2px 8px rgba(46, 93, 167, 0.05);
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .panel h2 {
@@ -758,6 +761,13 @@ body {
 /* Mixing tank calculator */
 .calc-page {
   max-width: 720px;
+  width: 100%;
+  min-width: 0;
+}
+
+.app.calc-page {
+  max-width: min(100%, 720px);
+  overflow-x: hidden;
 }
 
 .calc-inputs-panel h2 {
@@ -838,6 +848,8 @@ body {
 
 .calc-table-panel {
   padding: 0;
+  max-width: 100%;
+  min-width: 0;
   overflow: hidden;
 }
 
@@ -845,6 +857,8 @@ body {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .calc-table {
@@ -1129,27 +1143,156 @@ body {
   color: var(--text);
 }
 
-.jacketed-page .calc-table {
-  min-width: 680px;
-}
-
 .jacketed-table .dim-value {
   display: block;
   text-align: center;
   padding: 0.25rem;
 }
 
-@media (max-width: 767px) {
-  .table-scroll-hint {
-    display: block;
-  }
-
+/* Desktop / tablet: wide table with horizontal scroll if needed */
+@media (min-width: 768px) {
   .calc-table:not(.jacketed-table) {
     min-width: 580px;
   }
 
   .jacketed-table {
     min-width: 680px;
+  }
+}
+
+@media (max-width: 767px) {
+  .table-scroll-hint {
+    display: none;
+  }
+
+  .calc-table-panel {
+    overflow: visible;
+  }
+
+  .calc-table-wrap {
+    overflow-x: visible;
+    max-width: 100%;
+  }
+
+  .calc-table,
+  .calc-table.jacketed-table {
+    min-width: 0 !important;
+    width: 100%;
+  }
+
+  .calc-table thead {
+    display: none;
+  }
+
+  .calc-table tbody tr:not(.total-row) {
+    display: block;
+    margin: 0 0.75rem 0.75rem;
+    padding: 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .calc-table tbody tr:nth-child(even):not(.total-row) {
+    background: var(--surface-2);
+  }
+
+  .calc-table tbody tr.total-row {
+    display: block;
+    margin: 0 0.75rem 0.5rem;
+    padding: 0.65rem 0.75rem;
+    border-radius: var(--radius-sm);
+    background: #fff3cd;
+    border: 1px solid #e8a317;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .calc-table td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.45rem 0;
+    border-bottom: 1px solid var(--border);
+    text-align: right;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .calc-table td:last-child {
+    border-bottom: none;
+  }
+
+  .calc-table td::before {
+    content: attr(data-label);
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    text-align: left;
+    flex: 0 1 40%;
+    min-width: 0;
+  }
+
+  .calc-table td.item-name {
+    display: block;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.5rem;
+    margin-bottom: 0.25rem;
+    font-size: 0.95rem;
+    text-align: left;
+    white-space: normal;
+    word-break: break-word;
+  }
+
+  .calc-table td.item-name::before {
+    content: none;
+  }
+
+  .calc-table td.hide-mobile,
+  .calc-table td.param-cell:has(.param-empty) {
+    display: none;
+  }
+
+  .calc-table td.param-cell,
+  .calc-table td.rate-cell,
+  .calc-table td.num {
+    justify-content: space-between;
+  }
+
+  .calc-table td.num,
+  .calc-table td .dim-value {
+    flex: 1 1 auto;
+    min-width: 0;
+    text-align: right;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  .calc-table td.param-cell .param-input,
+  .calc-table td.rate-cell .rate-input {
+    flex: 1 1 auto;
+    min-width: 0;
+    max-width: 55%;
+    width: auto;
+  }
+
+  .jacketed-table .dim-value {
+    text-align: right;
+  }
+
+  .calc-table .total-row td.item-name {
+    margin-bottom: 0;
+    padding-bottom: 0.45rem;
+  }
+
+  .calc-table .total-row td:not(.hide-mobile):not(.item-name) {
+    font-weight: 700;
   }
 
   .page-header h1 {
@@ -1210,108 +1353,6 @@ body {
 
   .input-wrap input {
     font-size: 16px;
-  }
-
-  /* Card layout for calculation table */
-  .table-scroll-hint {
-    display: none;
-  }
-
-  .calc-table-wrap {
-    overflow-x: visible;
-  }
-
-  .calc-table {
-    min-width: 0;
-  }
-
-  .calc-table thead {
-    display: none;
-  }
-
-  .calc-table tbody tr:not(.total-row) {
-    display: block;
-    margin: 0 0.75rem 0.75rem;
-    padding: 0.75rem;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    background: var(--surface);
-  }
-
-  .calc-table tbody tr:nth-child(even):not(.total-row) {
-    background: var(--surface-2);
-  }
-
-  .calc-table tbody tr.total-row {
-    display: block;
-    margin: 0 0.75rem 0.5rem;
-    padding: 0.65rem 0.75rem;
-    border-radius: var(--radius-sm);
-    background: #fff3cd;
-    border: 1px solid #e8a317;
-  }
-
-  .calc-table td {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.75rem;
-    padding: 0.45rem 0;
-    border-bottom: 1px solid var(--border);
-    text-align: right;
-  }
-
-  .calc-table td:last-child {
-    border-bottom: none;
-  }
-
-  .calc-table td::before {
-    content: attr(data-label);
-    font-size: 0.7rem;
-    font-weight: 600;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    text-align: left;
-    flex-shrink: 0;
-  }
-
-  .calc-table td.item-name {
-    display: block;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 0.5rem;
-    margin-bottom: 0.25rem;
-    font-size: 0.95rem;
-    text-align: left;
-  }
-
-  .calc-table td.item-name::before {
-    content: none;
-  }
-
-  .calc-table td.hide-mobile,
-  .calc-table td.param-cell:has(.param-empty) {
-    display: none;
-  }
-
-  .calc-table td.param-cell,
-  .calc-table td.rate-cell {
-    justify-content: space-between;
-  }
-
-  .calc-table td.param-cell .param-input,
-  .calc-table td.rate-cell .rate-input {
-    max-width: 120px;
-    flex: 1;
-  }
-
-  .calc-table .total-row td.item-name {
-    margin-bottom: 0;
-    padding-bottom: 0.45rem;
-  }
-
-  .calc-table .total-row td:not(.hide-mobile):not(.item-name) {
-    font-weight: 700;
   }
 
   .summary-row.grand-total {
