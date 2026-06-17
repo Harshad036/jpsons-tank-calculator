@@ -134,6 +134,8 @@ export function calculateJacketedLineItems(
 
   const jacketDishL = topL + 100;
   const jacketDishW = flatW + 100;
+  const jacketShellW = (d + 100) * PI;
+  const insulationShellW = (d + 200) * PI;
 
   const items: Omit<JacketedLineItem, 'rate' | 'totalAmount'>[] = [
     {
@@ -184,9 +186,9 @@ export function calculateJacketedLineItems(
       id: 'jacketShell',
       name: 'JACKET SHELL',
       l: tankH - 150,
-      w: d * PI,
+      w: jacketShellW,
       h: p.jacketShellH,
-      result: calcWeight(tankH - 150, d * PI, p.jacketShellH),
+      result: calcWeight(tankH - 150, jacketShellW, p.jacketShellH),
       editableL: false,
       editableW: false,
       editableH: true,
@@ -217,9 +219,9 @@ export function calculateJacketedLineItems(
       id: 'insulationShell',
       name: 'INSULATION SHELL',
       l: tankH - 150,
-      w: (d + 100) * PI,
+      w: insulationShellW,
       h: p.insulationShell.h,
-      result: calcWeight(tankH - 150, (d + 100) * PI, p.insulationShell.h),
+      result: calcWeight(tankH - 150, insulationShellW, p.insulationShell.h),
       editableL: false,
       editableW: false,
       editableH: true,
