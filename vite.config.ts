@@ -20,6 +20,11 @@ export default defineConfig(({ mode }) => {
 
   return {
   base,
+  server: {
+    host: true,
+    port: 5173,
+    strictPort: true,
+  },
   plugins: [
     react(),
     VitePWA({
@@ -27,7 +32,7 @@ export default defineConfig(({ mode }) => {
       devOptions: {
         enabled: false,
       },
-      includeAssets: ['logo.png', 'mixing-tank.png', 'favicon-32.png'],
+      includeAssets: ['logo.png', 'mixing-tank.png', 'jacketed-mixing-tank.png', 'agitator.png', 'favicon-32.png'],
       manifest: {
         id: base,
         name: 'JP Sons Engineering',

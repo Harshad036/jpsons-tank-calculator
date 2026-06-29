@@ -1,5 +1,6 @@
 import { Navigate, useParams } from 'react-router-dom';
 import { getItemById } from '../data/items';
+import AgitatorCalculatorPage from './AgitatorCalculatorPage';
 import JacketedCalculatorPage from './JacketedCalculatorPage';
 import MixingCalculatorPage from './MixingCalculatorPage';
 
@@ -9,6 +10,10 @@ export default function CalculatorPage() {
 
   if (!item) {
     return <Navigate to="/" replace />;
+  }
+
+  if (item.id === 'agitator') {
+    return <AgitatorCalculatorPage item={item} />;
   }
 
   if (item.id === 'jacketed-mixing-tank') {

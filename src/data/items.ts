@@ -16,7 +16,13 @@ export const CALCULATOR_ITEMS: CalculatorItem[] = [
     id: 'jacketed-mixing-tank',
     title: 'Jacketed Mixing Tank',
     description: 'Jacketed mixing tank with insulation calculator',
-    image: 'mixing-tank.png',
+    image: 'jacketed-mixing-tank.png',
+  },
+  {
+    id: 'agitator',
+    title: 'Agitator',
+    description: 'Single and double agitator material and cost calculator',
+    image: 'agitator.png',
   },
 ];
 

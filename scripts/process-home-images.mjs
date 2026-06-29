@@ -54,7 +54,7 @@ async function processAsset(filename) {
   console.log(`Processed ${filename} with page background ${PAGE_BG_HEX}`);
 }
 
-const assets = ['logo.png', 'mixing-tank.png'];
+const assets = ['logo.png', 'mixing-tank.png', 'jacketed-mixing-tank.png', 'agitator.png'];
 
 for (const asset of assets) {
   await processAsset(asset);
