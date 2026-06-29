@@ -36,6 +36,7 @@ export default function AgitatorCalculatorPage({ item }: Props) {
   const [gearboxCost, setGearboxCost] = useState(DEFAULT_GEARBOX_COST);
   const [sealCost, setSealCost] = useState(DEFAULT_SEAL_COST);
   const [profitPercent, setProfitPercent] = useState(DEFAULT_PROFIT_PERCENT);
+  const [pdfLoading, setPdfLoading] = useState(false);
 
   const handleTypeChange = (type: AgitatorType) => {
     setAgitatorType(type);
@@ -131,6 +132,30 @@ export default function AgitatorCalculatorPage({ item }: Props) {
     return <span className="dim-value">{row.variantLabel}</span>;
   };
 
+  const handleDownloadPdf = async () => {
+    setPdfLoading(true);
+    try {
+      const { generateAgitatorPdf } = await import('../lib/generateAgitatorPdf');
+      await generateAgitatorPdf({
+        itemTitle: item.title,
+        agitatorType,
+        lineItems,
+        totalWeight,
+        totalMaterialAmount,
+        labourPercent,
+        labourCost,
+        motorCost,
+        gearboxCost,
+        sealCost,
+        profitPercent,
+        profitCost,
+        finalAmount,
+      });
+    } finally {
+      setPdfLoading(false);
+    }
+  };
+
   return (
     <div className="app calc-page agitator-page">
       <header className="page-header">
@@ -140,6 +165,14 @@ export default function AgitatorCalculatorPage({ item }: Props) {
             <h1>{item.title}</h1>
             <p className="subtitle">Calculation Logic Development Sheet — Agitator</p>
           </div>
+          <button
+            type="button"
+            className="btn-download-pdf"
+            onClick={handleDownloadPdf}
+            disabled={pdfLoading}
+          >
+            {pdfLoading ? 'Generating…' : 'Download PDF'}
+          </button>
         </div>
       </header>
 
