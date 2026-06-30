@@ -1,11 +1,13 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { assetUrl } from './assetUrl';
+import { drawProjectName, projectNameFilenamePart } from './pdfProjectName';
 import type { ComponentParams, LegParams, LineItemResult } from './mixingTankCalculations';
 import { formatCurrency, formatNum } from './mixingTankCalculations';
 
 export interface CalculatorPdfData {
   itemTitle: string;
+  projectName: string;
   ltr: number;
   diameter: number;
   height: number;
@@ -94,6 +96,9 @@ export async function generateCalculatorPdf(data: CalculatorPdfData): Promise<vo
   doc.setFont('helvetica', 'bold');
   doc.text(data.itemTitle, pageWidth / 2, y, { align: 'center' });
   y += 8;
+
+  y = drawProjectName(doc, data.projectName, pageWidth, y);
+  if (data.projectName.trim()) y += 2;
 
   doc.setFontSize(10);
   doc.setTextColor(30, 30, 30);
@@ -206,6 +211,6 @@ export async function generateCalculatorPdf(data: CalculatorPdfData): Promise<vo
     },
   });
 
-  const filename = `mixing-tank-${data.ltr}L-${dateStr.replace(/\s/g, '-')}.pdf`;
+  const filename = `mixing-tank${projectNameFilenamePart(data.projectName)}-${data.ltr}L-${dateStr.replace(/\s/g, '-')}.pdf`;
   doc.save(filename);
 }

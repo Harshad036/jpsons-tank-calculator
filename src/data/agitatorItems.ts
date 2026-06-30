@@ -29,7 +29,7 @@ export const AGITATOR_ITEMS: AgitatorItemDef[] = [
     id: 'brgShaft',
     name: 'BRG SHAFT',
     formula: 'cylinder',
-    defaultRate: 300,
+    defaultRate: 100,
     variants: [
       { id: 's-40-165', label: '40 × 165', usedFor: 'SINGLE', diameter: 40, length: 165, editableFields: [] },
       { id: 's-50-165', label: '50 × 165', usedFor: 'SINGLE', diameter: 50, length: 165, editableFields: [] },
@@ -40,7 +40,7 @@ export const AGITATOR_ITEMS: AgitatorItemDef[] = [
     id: 'brgHousing',
     name: 'BRG HOUSING',
     formula: 'cylinder',
-    defaultRate: 300,
+    defaultRate: 100,
     variants: [
       { id: 's-160-100', label: '160 × 100', usedFor: 'SINGLE', diameter: 160, length: 100, editableFields: [] },
       { id: 'sd-200-100', label: '200 × 100', usedFor: 'SINGLE/DOUBLE', diameter: 200, length: 100, editableFields: [] },
@@ -51,7 +51,7 @@ export const AGITATOR_ITEMS: AgitatorItemDef[] = [
     id: 'mountingPlate',
     name: 'MOUNTING PLATE',
     formula: 'plate_rect',
-    defaultRate: 300,
+    defaultRate: 100,
     variants: [
       { id: 's-200', label: '200 × 200 × 10', usedFor: 'SINGLE', length: 200, width: 200, thickness: 10, editableFields: [] },
       { id: 's-240', label: '240 × 240 × 10', usedFor: 'SINGLE', length: 240, width: 240, thickness: 10, editableFields: [] },
@@ -63,7 +63,7 @@ export const AGITATOR_ITEMS: AgitatorItemDef[] = [
     id: 'gearboxPlate',
     name: 'GEARBOX PLATE',
     formula: 'plate_circle',
-    defaultRate: 300,
+    defaultRate: 100,
     variants: [
       { id: 'd-330-10', label: 'Ø 330 × THK 10', usedFor: 'DOUBLE', diameter: 330, thickness: 10, editableFields: ['diameter', 'thickness'] },
     ],
@@ -72,7 +72,7 @@ export const AGITATOR_ITEMS: AgitatorItemDef[] = [
     id: 'housingPlate',
     name: 'HOUSING PLATE',
     formula: 'plate_circle',
-    defaultRate: 300,
+    defaultRate: 100,
     variants: [
       { id: 'd-400-10', label: 'Ø 400 × THK 10', usedFor: 'DOUBLE', diameter: 400, thickness: 10, editableFields: ['diameter', 'thickness'] },
     ],
@@ -81,7 +81,7 @@ export const AGITATOR_ITEMS: AgitatorItemDef[] = [
     id: 'sealPlate',
     name: 'SEAL PLATE',
     formula: 'plate_circle',
-    defaultRate: 300,
+    defaultRate: 100,
     variants: [
       { id: 'd-400-10', label: 'Ø 400 × THK 10', usedFor: 'DOUBLE', diameter: 400, thickness: 10, editableFields: ['diameter', 'thickness'] },
     ],
@@ -90,7 +90,7 @@ export const AGITATOR_ITEMS: AgitatorItemDef[] = [
     id: 'flexibleCoupling',
     name: 'FLEXIBLE COUPLING',
     formula: 'cylinder',
-    defaultRate: 300,
+    defaultRate: 100,
     variants: [
       { id: 'd-120-50', label: '120 × 50', usedFor: 'DOUBLE', diameter: 120, length: 50, editableFields: [] },
       { id: 'd-150-80', label: '150 × 80', usedFor: 'DOUBLE', diameter: 150, length: 80, editableFields: [] },
@@ -101,7 +101,7 @@ export const AGITATOR_ITEMS: AgitatorItemDef[] = [
     id: 'rigidCoupling',
     name: 'RIGID COUPLING',
     formula: 'cylinder',
-    defaultRate: 300,
+    defaultRate: 100,
     variants: [
       { id: 'sd-120-50', label: '120 × 50', usedFor: 'SINGLE/DOUBLE', diameter: 120, length: 50, editableFields: [] },
       { id: 'sd-150-80', label: '150 × 80', usedFor: 'SINGLE/DOUBLE', diameter: 150, length: 80, editableFields: [] },
@@ -112,7 +112,7 @@ export const AGITATOR_ITEMS: AgitatorItemDef[] = [
     id: 'lantern',
     name: 'LANTERN',
     formula: 'lantern',
-    defaultRate: 300,
+    defaultRate: 100,
     variants: [
       {
         id: 'd-330-1000-6',
@@ -129,7 +129,7 @@ export const AGITATOR_ITEMS: AgitatorItemDef[] = [
     id: 'gallen',
     name: 'GALLEN',
     formula: 'cylinder',
-    defaultRate: 300,
+    defaultRate: 100,
     variants: [
       { id: 'd-200-100', label: '200 × 100', usedFor: 'DOUBLE', diameter: 200, length: 100, editableFields: ['diameter', 'length'] },
     ],

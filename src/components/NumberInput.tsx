@@ -1,3 +1,5 @@
+import EditableNumberInput from './EditableNumberInput';
+
 interface NumberInputProps {
   id: string;
   label: string;
@@ -23,14 +25,13 @@ export default function NumberInput({
     <div className="field">
       <label htmlFor={id}>{label}</label>
       <div className="input-wrap">
-        <input
+        <EditableNumberInput
           id={id}
-          type="number"
-          value={value || ''}
+          value={value}
           min={min}
           max={max}
           step={step}
-          onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
+          onChange={onChange}
         />
         <span className="unit">{unit}</span>
       </div>

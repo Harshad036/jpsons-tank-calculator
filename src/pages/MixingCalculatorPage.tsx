@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import CalcInput from '../components/CalcInput';
+import EditableNumberInput from '../components/EditableNumberInput';
+import ProjectNameInput from '../components/ProjectNameInput';
 import type { CalculatorItem } from '../data/items';
 import { lookupByCapacity } from '../data/tankLookup';
 import {
@@ -39,6 +41,7 @@ export default function MixingCalculatorPage({ item }: Props) {
   const [panelCost, setPanelCost] = useState(25000);
   const [miscCost, setMiscCost] = useState(10000);
   const [pdfLoading, setPdfLoading] = useState(false);
+  const [projectName, setProjectName] = useState('');
 
   useEffect(() => {
     const row = lookupByCapacity(ltr);
@@ -96,6 +99,7 @@ export default function MixingCalculatorPage({ item }: Props) {
       const { generateCalculatorPdf } = await import('../lib/generateCalculatorPdf');
       await generateCalculatorPdf({
         itemTitle: item.title,
+        projectName,
         ltr,
         diameter,
         height,
@@ -143,6 +147,7 @@ export default function MixingCalculatorPage({ item }: Props) {
 
       <section className="panel calc-inputs-panel">
         <h2>Tank Inputs</h2>
+        <ProjectNameInput value={projectName} onChange={setProjectName} />
         <div className="calc-inputs-grid">
           <CalcInput id="ltr" label="LTR" value={ltr} onChange={setLtr} unit="L" />
           <CalcInput id="diameter" label="Ø" value={diameter} onChange={setDiameter} unit="mm" />
@@ -172,35 +177,28 @@ export default function MixingCalculatorPage({ item }: Props) {
                   <td className="item-name" data-label="Item">{row.name}</td>
                   <td className="param-cell" data-label="W">
                     {row.id === 'topRing' && (
-                      <input
-                        type="number"
+                      <EditableNumberInput
                         className="param-input"
                         value={topRing.w}
-                        onChange={(e) => updateComponentParam('topRing', 'w', parseFloat(e.target.value) || 0)}
+                        onChange={(v) => updateComponentParam('topRing', 'w', v)}
                       />
                     )}
                     {row.id === 'legPad' && (
-                      <input
-                        type="number"
-                        className="param-input"
+                      <EditableNumberInput className="param-input"
                         value={legPad.w}
-                        onChange={(e) => updateComponentParam('legPad', 'w', parseFloat(e.target.value) || 0)}
+                        onChange={(v) => updateComponentParam('legPad', 'w', v)}
                       />
                     )}
                     {row.id === 'basePlate' && (
-                      <input
-                        type="number"
-                        className="param-input"
+                      <EditableNumberInput className="param-input"
                         value={basePlate.w}
-                        onChange={(e) => updateComponentParam('basePlate', 'w', parseFloat(e.target.value) || 0)}
+                        onChange={(v) => updateComponentParam('basePlate', 'w', v)}
                       />
                     )}
                     {row.id === 'leg' && (
-                      <input
-                        type="number"
-                        className="param-input"
+                      <EditableNumberInput className="param-input"
                         value={leg.w}
-                        onChange={(e) => updateLegParam('w', parseFloat(e.target.value) || 0)}
+                        onChange={(v) => updateLegParam('w', v)}
                       />
                     )}
                     {!['topRing', 'legPad', 'basePlate', 'leg'].includes(row.id) && (
@@ -209,43 +207,33 @@ export default function MixingCalculatorPage({ item }: Props) {
                   </td>
                   <td className="param-cell" data-label="THK">
                     {row.id === 'top' && (
-                      <input
-                        type="number"
-                        className="param-input"
+                      <EditableNumberInput className="param-input"
                         value={topThickness}
-                        onChange={(e) => setTopThickness(parseFloat(e.target.value) || 0)}
+                        onChange={(v) => setTopThickness(v)}
                       />
                     )}
                     {row.id === 'topRing' && (
-                      <input
-                        type="number"
-                        className="param-input"
+                      <EditableNumberInput className="param-input"
                         value={topRing.thk}
-                        onChange={(e) => updateComponentParam('topRing', 'thk', parseFloat(e.target.value) || 0)}
+                        onChange={(v) => updateComponentParam('topRing', 'thk', v)}
                       />
                     )}
                     {row.id === 'legPad' && (
-                      <input
-                        type="number"
-                        className="param-input"
+                      <EditableNumberInput className="param-input"
                         value={legPad.thk}
-                        onChange={(e) => updateComponentParam('legPad', 'thk', parseFloat(e.target.value) || 0)}
+                        onChange={(v) => updateComponentParam('legPad', 'thk', v)}
                       />
                     )}
                     {row.id === 'basePlate' && (
-                      <input
-                        type="number"
-                        className="param-input"
+                      <EditableNumberInput className="param-input"
                         value={basePlate.thk}
-                        onChange={(e) => updateComponentParam('basePlate', 'thk', parseFloat(e.target.value) || 0)}
+                        onChange={(v) => updateComponentParam('basePlate', 'thk', v)}
                       />
                     )}
                     {row.id === 'leg' && (
-                      <input
-                        type="number"
-                        className="param-input"
+                      <EditableNumberInput className="param-input"
                         value={leg.thk}
-                        onChange={(e) => updateLegParam('thk', parseFloat(e.target.value) || 0)}
+                        onChange={(v) => updateLegParam('thk', v)}
                       />
                     )}
                     {!['top', 'topRing', 'legPad', 'basePlate', 'leg'].includes(row.id) && (
@@ -254,27 +242,21 @@ export default function MixingCalculatorPage({ item }: Props) {
                   </td>
                   <td className="param-cell" data-label="QTY / L">
                     {row.id === 'legPad' && (
-                      <input
-                        type="number"
-                        className="param-input"
+                      <EditableNumberInput className="param-input"
                         value={legPad.qty}
-                        onChange={(e) => updateComponentParam('legPad', 'qty', parseFloat(e.target.value) || 0)}
+                        onChange={(v) => updateComponentParam('legPad', 'qty', v)}
                       />
                     )}
                     {row.id === 'basePlate' && (
-                      <input
-                        type="number"
-                        className="param-input"
+                      <EditableNumberInput className="param-input"
                         value={basePlate.qty}
-                        onChange={(e) => updateComponentParam('basePlate', 'qty', parseFloat(e.target.value) || 0)}
+                        onChange={(v) => updateComponentParam('basePlate', 'qty', v)}
                       />
                     )}
                     {row.id === 'leg' && (
-                      <input
-                        type="number"
-                        className="param-input"
+                      <EditableNumberInput className="param-input"
                         value={leg.l}
-                        onChange={(e) => updateLegParam('l', parseFloat(e.target.value) || 0)}
+                        onChange={(v) => updateLegParam('l', v)}
                         title="Length (L)"
                       />
                     )}
@@ -284,11 +266,9 @@ export default function MixingCalculatorPage({ item }: Props) {
                   </td>
                   <td className="num" data-label="Result">{formatNum(row.result)}</td>
                   <td className="rate-cell" data-label="Rate">
-                    <input
-                      type="number"
-                      className="rate-input"
+                    <EditableNumberInput className="rate-input"
                       value={row.rate}
-                      onChange={(e) => updateRate(row.id, parseFloat(e.target.value) || 0)}
+                      onChange={(v) => updateRate(row.id, v)}
                     />
                   </td>
                   <td className="num" data-label="Total Amount">{formatCurrency(row.totalAmount)}</td>
@@ -367,14 +347,12 @@ function SummaryLabour({
         Labour Cost
         <span className="labour-percent-wrap">
           (
-          <input
-            type="number"
-            className="labour-percent-input"
+          <EditableNumberInput className="labour-percent-input"
             value={percent}
             min={0}
             max={100}
             step={1}
-            onChange={(e) => onPercentChange(parseFloat(e.target.value) || 0)}
+            onChange={(v) => onPercentChange(v)}
           />
           %)
         </span>
@@ -396,11 +374,9 @@ function SummaryEditable({
   return (
     <div className="summary-row editable">
       <span>{label}</span>
-      <input
-        type="number"
-        className="summary-input"
+      <EditableNumberInput className="summary-input"
         value={value}
-        onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
+        onChange={(v) => onChange(v)}
       />
     </div>
   );

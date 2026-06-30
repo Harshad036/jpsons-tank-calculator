@@ -2,11 +2,13 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import type { AgitatorType } from '../data/agitatorItems';
 import { assetUrl } from './assetUrl';
+import { drawProjectName, projectNameFilenamePart } from './pdfProjectName';
 import type { AgitatorLineItem } from './agitatorCalculations';
 import { formatCurrency, formatNum } from './agitatorCalculations';
 
 export interface AgitatorPdfData {
   itemTitle: string;
+  projectName: string;
   agitatorType: AgitatorType;
   lineItems: AgitatorLineItem[];
   totalWeight: number;
@@ -72,6 +74,9 @@ export async function generateAgitatorPdf(data: AgitatorPdfData): Promise<void> 
   doc.setFont('helvetica', 'bold');
   doc.text(data.itemTitle, pageWidth / 2, y, { align: 'center' });
   y += 7;
+
+  y = drawProjectName(doc, data.projectName, pageWidth, y);
+  if (data.projectName.trim()) y += 2;
 
   doc.setFontSize(10);
   doc.setTextColor(30, 30, 30);
@@ -168,6 +173,6 @@ export async function generateAgitatorPdf(data: AgitatorPdfData): Promise<void> 
     },
   });
 
-  const filename = `agitator-${data.agitatorType.toLowerCase()}-${dateStr.replace(/\s/g, '-')}.pdf`;
+  const filename = `agitator${projectNameFilenamePart(data.projectName)}-${data.agitatorType.toLowerCase()}-${dateStr.replace(/\s/g, '-')}.pdf`;
   doc.save(filename);
 }

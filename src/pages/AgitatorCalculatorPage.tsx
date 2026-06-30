@@ -1,5 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import EditableNumberInput from '../components/EditableNumberInput';
+import ProjectNameInput from '../components/ProjectNameInput';
 import type { CalculatorItem } from '../data/items';
 import {
   AGITATOR_TYPE_OPTIONS,
@@ -37,6 +39,7 @@ export default function AgitatorCalculatorPage({ item }: Props) {
   const [sealCost, setSealCost] = useState(DEFAULT_SEAL_COST);
   const [profitPercent, setProfitPercent] = useState(DEFAULT_PROFIT_PERCENT);
   const [pdfLoading, setPdfLoading] = useState(false);
+  const [projectName, setProjectName] = useState('');
 
   const handleTypeChange = (type: AgitatorType) => {
     setAgitatorType(type);
@@ -99,11 +102,9 @@ export default function AgitatorCalculatorPage({ item }: Props) {
     const display = value ?? 0;
     if (editable) {
       return (
-        <input
-          type="number"
-          className="param-input"
+        <EditableNumberInput className="param-input"
           value={display}
-          onChange={(e) => updateDim(row.id, field, parseFloat(e.target.value) || 0)}
+          onChange={(v) => updateDim(row.id, field, v)}
         />
       );
     }
@@ -138,6 +139,7 @@ export default function AgitatorCalculatorPage({ item }: Props) {
       const { generateAgitatorPdf } = await import('../lib/generateAgitatorPdf');
       await generateAgitatorPdf({
         itemTitle: item.title,
+        projectName,
         agitatorType,
         lineItems,
         totalWeight,
@@ -177,6 +179,7 @@ export default function AgitatorCalculatorPage({ item }: Props) {
       </header>
 
       <section className="panel calc-inputs-panel">
+        <ProjectNameInput value={projectName} onChange={setProjectName} />
         <div className="agitator-type-row">
           <label className="agitator-type-label" htmlFor="agitator-type">Type</label>
           <select
@@ -229,11 +232,9 @@ export default function AgitatorCalculatorPage({ item }: Props) {
                     </td>
                     <td className="num" data-label="Result">{formatNum(row.result)}</td>
                     <td className="rate-cell" data-label="Rate">
-                      <input
-                        type="number"
-                        className="rate-input"
+                      <EditableNumberInput className="rate-input"
                         value={row.rate}
-                        onChange={(e) => updateRate(row.id, parseFloat(e.target.value) || 0)}
+                        onChange={(v) => updateRate(row.id, v)}
                       />
                     </td>
                     <td className="num" data-label="Total Amount">{formatCurrency(row.totalAmount)}</td>
@@ -305,14 +306,12 @@ function SummaryLabour({
         Labour
         <span className="labour-percent-wrap">
           (
-          <input
-            type="number"
-            className="labour-percent-input"
+          <EditableNumberInput className="labour-percent-input"
             value={percent}
             min={0}
             max={100}
             step={1}
-            onChange={(e) => onPercentChange(parseFloat(e.target.value) || 0)}
+            onChange={(v) => onPercentChange(v)}
           />
           %)
         </span>
@@ -337,14 +336,12 @@ function SummaryProfit({
         Profit
         <span className="labour-percent-wrap">
           (
-          <input
-            type="number"
-            className="profit-percent-input"
+          <EditableNumberInput className="profit-percent-input"
             value={percent}
             min={0}
             max={100}
             step={0.5}
-            onChange={(e) => onPercentChange(parseFloat(e.target.value) || 0)}
+            onChange={(v) => onPercentChange(v)}
           />
           %)
         </span>
@@ -366,11 +363,9 @@ function SummaryEditable({
   return (
     <div className="summary-row editable">
       <span>{label}</span>
-      <input
-        type="number"
-        className="summary-input"
+      <EditableNumberInput className="summary-input"
         value={value}
-        onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
+        onChange={(v) => onChange(v)}
       />
     </div>
   );

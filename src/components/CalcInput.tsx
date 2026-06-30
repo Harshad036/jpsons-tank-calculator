@@ -1,3 +1,5 @@
+import EditableNumberInput from './EditableNumberInput';
+
 interface CalcInputProps {
   id: string;
   label: string;
@@ -19,13 +21,12 @@ export default function CalcInput({
     <div className="calc-field">
       <label htmlFor={id}>{label}</label>
       <div className="calc-input-wrap">
-        <input
+        <EditableNumberInput
           id={id}
-          type="number"
           className="calc-input"
-          value={value || ''}
+          value={value}
           step={step}
-          onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
+          onChange={onChange}
         />
         {unit && <span className="calc-unit">{unit}</span>}
       </div>

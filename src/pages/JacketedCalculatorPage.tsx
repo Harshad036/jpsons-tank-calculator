@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import CalcInput from '../components/CalcInput';
+import EditableNumberInput from '../components/EditableNumberInput';
+import ProjectNameInput from '../components/ProjectNameInput';
 import type { CalculatorItem } from '../data/items';
 import { lookupByCapacity } from '../data/tankLookup';
 import {
@@ -31,6 +33,7 @@ export default function JacketedCalculatorPage({ item }: Props) {
   const [panelCost, setPanelCost] = useState(25000);
   const [miscCost, setMiscCost] = useState(10000);
   const [pdfLoading, setPdfLoading] = useState(false);
+  const [projectName, setProjectName] = useState('');
 
   useEffect(() => {
     const row = lookupByCapacity(ltr);
@@ -62,6 +65,7 @@ export default function JacketedCalculatorPage({ item }: Props) {
       const { generateJacketedPdf } = await import('../lib/generateJacketedPdf');
       await generateJacketedPdf({
         itemTitle: item.title,
+        projectName,
         ltr,
         diameter,
         height,
@@ -145,11 +149,9 @@ export default function JacketedCalculatorPage({ item }: Props) {
       dim === 'l' ? row.editableL : dim === 'w' ? row.editableW : row.editableH;
     if (editable && onChange) {
       return (
-        <input
-          type="number"
-          className="param-input"
+        <EditableNumberInput className="param-input"
           value={value}
-          onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
+          onChange={(v) => onChange(v)}
         />
       );
     }
@@ -220,6 +222,7 @@ export default function JacketedCalculatorPage({ item }: Props) {
       </header>
 
       <section className="panel calc-inputs-panel">
+        <ProjectNameInput value={projectName} onChange={setProjectName} />
         <div className="calc-inputs-grid">
           <CalcInput id="ltr" label="LTR" value={ltr} onChange={setLtr} unit="L" />
           <CalcInput id="diameter" label="Ø" value={diameter} onChange={setDiameter} unit="mm" />
@@ -261,11 +264,9 @@ export default function JacketedCalculatorPage({ item }: Props) {
                     </td>
                     <td className="num" data-label="Result">{formatNum(row.result)}</td>
                     <td className="rate-cell" data-label="Rate">
-                      <input
-                        type="number"
-                        className="rate-input"
+                      <EditableNumberInput className="rate-input"
                         value={row.rate}
-                        onChange={(e) => updateRate(row.id, parseFloat(e.target.value) || 0)}
+                        onChange={(v) => updateRate(row.id, v)}
                       />
                     </td>
                     <td className="num" data-label="Total Amount">{formatCurrency(row.totalAmount)}</td>
@@ -337,14 +338,12 @@ function SummaryLabour({
         Labour Cost
         <span className="labour-percent-wrap">
           (
-          <input
-            type="number"
-            className="labour-percent-input"
+          <EditableNumberInput className="labour-percent-input"
             value={percent}
             min={0}
             max={100}
             step={1}
-            onChange={(e) => onPercentChange(parseFloat(e.target.value) || 0)}
+            onChange={(v) => onPercentChange(v)}
           />
           %)
         </span>
@@ -366,11 +365,9 @@ function SummaryEditable({
   return (
     <div className="summary-row editable">
       <span>{label}</span>
-      <input
-        type="number"
-        className="summary-input"
+      <EditableNumberInput className="summary-input"
         value={value}
-        onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
+        onChange={(v) => onChange(v)}
       />
     </div>
   );
