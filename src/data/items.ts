@@ -24,6 +24,12 @@ export const CALCULATOR_ITEMS: CalculatorItem[] = [
     description: 'Single and double agitator material and cost calculator',
     image: 'agitator.png',
   },
+  {
+    id: 'high-shear-mixer',
+    title: 'High Shear Mixer',
+    description: 'High shear mixer material and cost calculator',
+    image: 'high-shear-mixer.png',
+  },
 ];
 
 export function getItemById(id: string): CalculatorItem | undefined {

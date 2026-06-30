@@ -3,26 +3,23 @@ import autoTable from 'jspdf-autotable';
 import { assetUrl } from './assetUrl';
 import { drawProjectName, projectNameFilenamePart } from './pdfProjectName';
 import { PDF_MAIN_TABLE_STYLES, drawPdfSummarySection, getLastAutoTableFinalY } from './pdfLayout';
-import type { JacketedLineItem } from './jacketedTankCalculations';
-import { formatCurrency, formatNum } from './jacketedTankCalculations';
+import type { HsmLineItem } from './highShearMixerCalculations';
+import { formatCurrency, formatNum } from './highShearMixerCalculations';
 
-export interface JacketedPdfData {
+export interface HighShearMixerPdfData {
   itemTitle: string;
   projectName: string;
-  ltr: number;
-  diameter: number;
-  height: number;
-  thickness: number;
-  lineItems: JacketedLineItem[];
+  lineItems: HsmLineItem[];
   totalWeight: number;
   totalMaterialAmount: number;
   labourPercent: number;
   labourCost: number;
-  agitatorCost: number;
-  panelCost: number;
+  motorCost: number;
+  rotorCost: number;
   miscCost: number;
+  profitPercent: number;
+  profitCost: number;
   grandTotal: number;
-  tankVolume: number;
 }
 
 async function loadImageDataUrl(path: string): Promise<string | null> {
@@ -40,8 +37,17 @@ async function loadImageDataUrl(path: string): Promise<string | null> {
   }
 }
 
-export async function generateJacketedPdf(data: JacketedPdfData): Promise<void> {
-  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+function dimCell(value: number | undefined): string {
+  return value === undefined ? '—' : formatNum(value);
+}
+
+function sizeCell(row: HsmLineItem): string {
+  if (row.allFieldsEditable && !row.hasVariantChoice) return '—';
+  return row.variantLabel;
+}
+
+export async function generateHighShearMixerPdf(data: HighShearMixerPdfData): Promise<void> {
+  const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
   const pageWidth = doc.internal.pageSize.getWidth();
   let y = 14;
 
@@ -55,11 +61,11 @@ export async function generateJacketedPdf(data: JacketedPdfData): Promise<void> 
   doc.text(`Date: ${dateStr}`, pageWidth - 14, y, { align: 'right' });
 
   const logoData = await loadImageDataUrl(assetUrl('logo.png'));
-  const logoWidth = 36;
-  const logoHeight = 36;
+  const logoWidth = 32;
+  const logoHeight = 32;
   if (logoData) {
-    doc.addImage(logoData, 'PNG', (pageWidth - logoWidth) / 2, y + 3, logoWidth, logoHeight);
-    y += logoHeight + 6;
+    doc.addImage(logoData, 'PNG', (pageWidth - logoWidth) / 2, y + 2, logoWidth, logoHeight);
+    y += logoHeight + 5;
   }
 
   doc.setFontSize(12);
@@ -71,23 +77,13 @@ export async function generateJacketedPdf(data: JacketedPdfData): Promise<void> 
   y = drawProjectName(doc, data.projectName, pageWidth, y);
   if (data.projectName.trim()) y += 2;
 
-  doc.setFontSize(10);
-  doc.setTextColor(30, 30, 30);
-  doc.setFont('helvetica', 'normal');
-  const inputs = [
-    `LTR: ${data.ltr} L`,
-    `Ø: ${data.diameter} mm`,
-    `H: ${data.height} mm`,
-    `THK: ${data.thickness} mm`,
-  ];
-  doc.text(inputs.join('   |   '), 14, y);
-  y += 7;
-
   const tableBody = data.lineItems.map((row) => [
     row.name,
-    formatNum(row.l, row.l > 1000 ? 0 : 2),
-    formatNum(row.w, row.w > 1000 ? 0 : 2),
-    formatNum(row.h, 2),
+    sizeCell(row),
+    dimCell(row.diameter),
+    dimCell(row.length),
+    dimCell(row.width),
+    dimCell(row.thickness),
     formatNum(row.result),
     formatNum(row.rate),
     formatCurrency(row.totalAmount),
@@ -98,14 +94,16 @@ export async function generateJacketedPdf(data: JacketedPdfData): Promise<void> 
     '',
     '',
     '',
+    '',
+    '',
     formatNum(data.totalWeight),
-    'Total Material Amount',
+    'Total Material Cost',
     formatCurrency(data.totalMaterialAmount),
   ]);
 
   autoTable(doc, {
     startY: y,
-    head: [['Item', 'L', 'W', 'H', 'Result', 'Rate', 'Total Amount']],
+    head: [['Item', 'Size', 'Ø', 'L', 'W', 'THK', 'Result', 'Rate', 'Total Amount']],
     body: tableBody,
     ...PDF_MAIN_TABLE_STYLES,
     headStyles: {
@@ -116,10 +114,10 @@ export async function generateJacketedPdf(data: JacketedPdfData): Promise<void> 
       cellPadding: 2,
     },
     columnStyles: {
-      0: { cellWidth: 32 },
-      4: { halign: 'right' },
-      5: { halign: 'right' },
+      0: { cellWidth: 36 },
       6: { halign: 'right' },
+      7: { halign: 'right' },
+      8: { halign: 'right' },
     },
     margin: { left: 10, right: 10, bottom: 4 },
     didParseCell(hook) {
@@ -136,17 +134,17 @@ export async function generateJacketedPdf(data: JacketedPdfData): Promise<void> 
     doc,
     finalY,
     [
-      ['Total Material Rate', formatCurrency(data.totalMaterialAmount)],
-      [`Labour Cost (${data.labourPercent}%)`, formatCurrency(data.labourCost)],
-      ['Agitator Cost', formatCurrency(data.agitatorCost)],
-      ['Panel Cost', formatCurrency(data.panelCost)],
-      ['Micelinious Cost', formatCurrency(data.miscCost)],
+      ['Total Material Cost', formatCurrency(data.totalMaterialAmount)],
+      [`Labour (${data.labourPercent}%)`, formatCurrency(data.labourCost)],
+      ['Motor', formatCurrency(data.motorCost)],
+      ['Rotor', formatCurrency(data.rotorCost)],
+      ['Miscellaneous', formatCurrency(data.miscCost)],
+      [`Profit (${data.profitPercent}%)`, formatCurrency(data.profitCost)],
       ['Grand Total', formatCurrency(data.grandTotal)],
-      ['Tank Volume (LTR)', `${formatNum(data.tankVolume)} L`],
     ],
-    { grandTotalRowIndex: 5, accentRowIndex: 6 },
+    { grandTotalRowIndex: 6 },
   );
 
-  const filename = `jacketed-tank${projectNameFilenamePart(data.projectName)}-${data.ltr}L-${dateStr.replace(/\s/g, '-')}.pdf`;
+  const filename = `high-shear-mixer${projectNameFilenamePart(data.projectName)}-${dateStr.replace(/\s/g, '-')}.pdf`;
   doc.save(filename);
 }

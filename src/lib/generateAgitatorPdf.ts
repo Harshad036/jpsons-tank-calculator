@@ -3,6 +3,7 @@ import autoTable from 'jspdf-autotable';
 import type { AgitatorType } from '../data/agitatorItems';
 import { assetUrl } from './assetUrl';
 import { drawProjectName, projectNameFilenamePart } from './pdfProjectName';
+import { PDF_MAIN_TABLE_STYLES, drawPdfSummarySection, getLastAutoTableFinalY } from './pdfLayout';
 import type { AgitatorLineItem } from './agitatorCalculations';
 import { formatCurrency, formatNum } from './agitatorCalculations';
 
@@ -43,7 +44,7 @@ function dimCell(value: number | undefined): string {
 }
 
 function sizeCell(row: AgitatorLineItem): string {
-  if (row.allFieldsEditable) return '—';
+  if (row.allFieldsEditable && !row.hasVariantChoice) return '—';
   return row.variantLabel;
 }
 
@@ -57,23 +58,23 @@ export async function generateAgitatorPdf(data: AgitatorPdfData): Promise<void> 
     month: 'short',
     year: 'numeric',
   });
-  doc.setFontSize(9);
+  doc.setFontSize(10);
   doc.setTextColor(80, 80, 80);
   doc.text(`Date: ${dateStr}`, pageWidth - 14, y, { align: 'right' });
 
   const logoData = await loadImageDataUrl(assetUrl('logo.png'));
-  const logoWidth = 40;
-  const logoHeight = 40;
+  const logoWidth = 32;
+  const logoHeight = 32;
   if (logoData) {
     doc.addImage(logoData, 'PNG', (pageWidth - logoWidth) / 2, y + 2, logoWidth, logoHeight);
-    y += logoHeight + 8;
+    y += logoHeight + 5;
   }
 
   doc.setFontSize(12);
   doc.setTextColor(46, 93, 167);
   doc.setFont('helvetica', 'bold');
   doc.text(data.itemTitle, pageWidth / 2, y, { align: 'center' });
-  y += 7;
+  y += 6;
 
   y = drawProjectName(doc, data.projectName, pageWidth, y);
   if (data.projectName.trim()) y += 2;
@@ -82,7 +83,7 @@ export async function generateAgitatorPdf(data: AgitatorPdfData): Promise<void> 
   doc.setTextColor(30, 30, 30);
   doc.setFont('helvetica', 'normal');
   doc.text(`Type: ${data.agitatorType}`, pageWidth / 2, y, { align: 'center' });
-  y += 10;
+  y += 6;
 
   const tableBody = data.lineItems.map((row) => [
     row.name,
@@ -112,21 +113,21 @@ export async function generateAgitatorPdf(data: AgitatorPdfData): Promise<void> 
     startY: y,
     head: [['Item', 'Size', 'Ø', 'L', 'W', 'THK', 'Result', 'Rate', 'Total Amount']],
     body: tableBody,
-    theme: 'grid',
+    ...PDF_MAIN_TABLE_STYLES,
     headStyles: {
       fillColor: [46, 93, 167],
       textColor: 255,
-      fontSize: 7,
+      fontSize: 8,
       fontStyle: 'bold',
+      cellPadding: 2,
     },
-    bodyStyles: { fontSize: 7, textColor: [30, 30, 30] },
     columnStyles: {
       0: { cellWidth: 36 },
       6: { halign: 'right' },
       7: { halign: 'right' },
       8: { halign: 'right' },
     },
-    margin: { left: 10, right: 10 },
+    margin: { left: 10, right: 10, bottom: 4 },
     didParseCell(hook) {
       if (hook.row.index === tableBody.length - 1) {
         hook.cell.styles.fillColor = [255, 243, 205];
@@ -135,43 +136,22 @@ export async function generateAgitatorPdf(data: AgitatorPdfData): Promise<void> 
     },
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const finalY = (doc as any).lastAutoTable?.finalY ?? y + 40;
-  let summaryY = finalY + 10;
+  const finalY = getLastAutoTableFinalY(doc, y + 40);
 
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(10);
-  doc.text('Cost Summary', 14, summaryY);
-  summaryY += 6;
-
-  const summaryRows: [string, string][] = [
-    ['Total Material Rate', formatCurrency(data.totalMaterialAmount)],
-    [`Labour (${data.labourPercent}%)`, formatCurrency(data.labourCost)],
-    ['Motor', formatCurrency(data.motorCost)],
-    ['Gearbox', formatCurrency(data.gearboxCost)],
-    ['Seal', formatCurrency(data.sealCost)],
-    [`Profit (${data.profitPercent}%)`, formatCurrency(data.profitCost)],
-    ['Final Amount', formatCurrency(data.finalAmount)],
-  ];
-
-  autoTable(doc, {
-    startY: summaryY,
-    body: summaryRows,
-    theme: 'plain',
-    styles: { fontSize: 9, cellPadding: 2.5 },
-    columnStyles: {
-      0: { fontStyle: 'bold', cellWidth: 70 },
-      1: { halign: 'right' },
-    },
-    margin: { left: 14, right: 14 },
-    didParseCell(hook) {
-      if (hook.row.index === 6) {
-        hook.cell.styles.fillColor = [232, 163, 23];
-        hook.cell.styles.textColor = 255;
-        hook.cell.styles.fontStyle = 'bold';
-      }
-    },
-  });
+  drawPdfSummarySection(
+    doc,
+    finalY,
+    [
+      ['Total Material Rate', formatCurrency(data.totalMaterialAmount)],
+      [`Labour (${data.labourPercent}%)`, formatCurrency(data.labourCost)],
+      ['Motor', formatCurrency(data.motorCost)],
+      ['Gearbox', formatCurrency(data.gearboxCost)],
+      ['Seal', formatCurrency(data.sealCost)],
+      [`Profit (${data.profitPercent}%)`, formatCurrency(data.profitCost)],
+      ['Final Amount', formatCurrency(data.finalAmount)],
+    ],
+    { grandTotalRowIndex: 6 },
+  );
 
   const filename = `agitator${projectNameFilenamePart(data.projectName)}-${data.agitatorType.toLowerCase()}-${dateStr.replace(/\s/g, '-')}.pdf`;
   doc.save(filename);

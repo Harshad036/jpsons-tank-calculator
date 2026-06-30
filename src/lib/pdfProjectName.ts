@@ -9,7 +9,7 @@ export function drawProjectName(
   const trimmed = projectName.trim();
   if (!trimmed) return y;
 
-  doc.setFontSize(10);
+  doc.setFontSize(11);
   doc.setTextColor(30, 30, 30);
   doc.setFont('helvetica', 'bold');
   doc.text(`Project: ${trimmed}`, pageWidth / 2, y, { align: 'center' });

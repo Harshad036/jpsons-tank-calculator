@@ -4,64 +4,61 @@ import EditableNumberInput from '../components/EditableNumberInput';
 import ProjectNameInput from '../components/ProjectNameInput';
 import type { CalculatorItem } from '../data/items';
 import {
-  AGITATOR_TYPE_OPTIONS,
-  type AgitatorType,
+  HIGH_SHEAR_MIXER_ITEMS,
   type DimField,
-  itemsForType,
-  variantsForType,
-} from '../data/agitatorItems';
+} from '../data/highShearMixerItems';
 import {
-  type AgitatorLineItem,
-  DEFAULT_GEARBOX_COST,
+  type HsmLineItem,
   DEFAULT_LABOUR_PERCENT,
+  DEFAULT_MISC_COST,
   DEFAULT_MOTOR_COST,
   DEFAULT_PROFIT_PERCENT,
-  DEFAULT_SEAL_COST,
+  DEFAULT_ROTOR_COST,
   buildDefaultState,
-  calcProfitBase,
-  calculateAgitatorLineItems,
+  calcGrandTotal,
+  calculateHsmLineItems,
   dimensionsFromVariant,
   formatCurrency,
   formatNum,
   isDimEditable,
-} from '../lib/agitatorCalculations';
+} from '../lib/highShearMixerCalculations';
 
 interface Props {
   item: CalculatorItem;
 }
 
-export default function AgitatorCalculatorPage({ item }: Props) {
-  const [agitatorType, setAgitatorType] = useState<AgitatorType>('SINGLE');
-  const [itemStates, setItemStates] = useState(() => buildDefaultState('SINGLE'));
+export default function HighShearMixerCalculatorPage({ item }: Props) {
+  const [itemStates, setItemStates] = useState(() => buildDefaultState());
   const [labourPercent, setLabourPercent] = useState(DEFAULT_LABOUR_PERCENT);
   const [motorCost, setMotorCost] = useState(DEFAULT_MOTOR_COST);
-  const [gearboxCost, setGearboxCost] = useState(DEFAULT_GEARBOX_COST);
-  const [sealCost, setSealCost] = useState(DEFAULT_SEAL_COST);
+  const [rotorCost, setRotorCost] = useState(DEFAULT_ROTOR_COST);
+  const [miscCost, setMiscCost] = useState(DEFAULT_MISC_COST);
   const [profitPercent, setProfitPercent] = useState(DEFAULT_PROFIT_PERCENT);
   const [pdfLoading, setPdfLoading] = useState(false);
   const [projectName, setProjectName] = useState('');
 
-  const handleTypeChange = (type: AgitatorType) => {
-    setAgitatorType(type);
-    setItemStates(buildDefaultState(type));
-  };
-
   const lineItems = useMemo(
-    () => calculateAgitatorLineItems(agitatorType, itemStates),
-    [agitatorType, itemStates],
+    () => calculateHsmLineItems(itemStates),
+    [itemStates],
   );
 
   const totalWeight = lineItems.reduce((sum, row) => sum + row.result, 0);
   const totalMaterialAmount = lineItems.reduce((sum, row) => sum + row.totalAmount, 0);
   const labourCost = totalMaterialAmount * (labourPercent / 100);
-  const profitBase = calcProfitBase(totalMaterialAmount, labourCost, motorCost, gearboxCost, sealCost);
-  const profitCost = profitBase * (profitPercent / 100);
-  const finalAmount = profitBase + profitCost;
+  const profitCost = totalMaterialAmount * (profitPercent / 100);
+  const grandTotal = calcGrandTotal(
+    totalMaterialAmount,
+    labourCost,
+    motorCost,
+    rotorCost,
+    miscCost,
+    profitCost,
+  );
 
   const updateVariant = (itemId: string, variantId: string) => {
-    const def = itemsForType(agitatorType).find((i) => i.id === itemId);
+    const def = HIGH_SHEAR_MIXER_ITEMS.find((i) => i.id === itemId);
     if (!def) return;
-    const variant = variantsForType(def, agitatorType).find((v) => v.id === variantId);
+    const variant = def.variants.find((v) => v.id === variantId);
     if (!variant) return;
     setItemStates((prev) => ({
       ...prev,
@@ -91,7 +88,7 @@ export default function AgitatorCalculatorPage({ item }: Props) {
   };
 
   const renderDimCell = (
-    row: AgitatorLineItem,
+    row: HsmLineItem,
     field: DimField,
     value: number | undefined,
   ) => {
@@ -102,7 +99,8 @@ export default function AgitatorCalculatorPage({ item }: Props) {
     const display = value ?? 0;
     if (editable) {
       return (
-        <EditableNumberInput className="param-input"
+        <EditableNumberInput
+          className="param-input"
           value={display}
           onChange={(v) => updateDim(row.id, field, v)}
         />
@@ -111,17 +109,16 @@ export default function AgitatorCalculatorPage({ item }: Props) {
     return <span className="dim-value">{formatNum(display)}</span>;
   };
 
-  const renderSizeCell = (row: AgitatorLineItem) => {
+  const renderSizeCell = (row: HsmLineItem) => {
     if (row.hasVariantChoice) {
-      const def = itemsForType(agitatorType).find((i) => i.id === row.id)!;
-      const variants = variantsForType(def, agitatorType);
+      const def = HIGH_SHEAR_MIXER_ITEMS.find((i) => i.id === row.id)!;
       return (
         <select
           className="variant-select"
           value={itemStates[row.id].variantId}
           onChange={(e) => updateVariant(row.id, e.target.value)}
         >
-          {variants.map((v) => (
+          {def.variants.map((v) => (
             <option key={v.id} value={v.id}>{v.label}</option>
           ))}
         </select>
@@ -136,22 +133,21 @@ export default function AgitatorCalculatorPage({ item }: Props) {
   const handleDownloadPdf = async () => {
     setPdfLoading(true);
     try {
-      const { generateAgitatorPdf } = await import('../lib/generateAgitatorPdf');
-      await generateAgitatorPdf({
+      const { generateHighShearMixerPdf } = await import('../lib/generateHighShearMixerPdf');
+      await generateHighShearMixerPdf({
         itemTitle: item.title,
         projectName,
-        agitatorType,
         lineItems,
         totalWeight,
         totalMaterialAmount,
         labourPercent,
         labourCost,
         motorCost,
-        gearboxCost,
-        sealCost,
+        rotorCost,
+        miscCost,
         profitPercent,
         profitCost,
-        finalAmount,
+        grandTotal,
       });
     } finally {
       setPdfLoading(false);
@@ -159,13 +155,13 @@ export default function AgitatorCalculatorPage({ item }: Props) {
   };
 
   return (
-    <div className="app calc-page agitator-page">
+    <div className="app calc-page high-shear-mixer-page">
       <header className="page-header">
         <Link to="/" className="back-link">← Back</Link>
         <div className="calc-page-title-row">
           <div>
             <h1>{item.title}</h1>
-            <p className="subtitle">Calculation Logic Development Sheet — Agitator</p>
+            <p className="subtitle">Calculation Logic Development Sheet — High Shear Mixer</p>
           </div>
           <button
             type="button"
@@ -180,24 +176,11 @@ export default function AgitatorCalculatorPage({ item }: Props) {
 
       <section className="panel calc-inputs-panel">
         <ProjectNameInput value={projectName} onChange={setProjectName} />
-        <div className="agitator-type-row">
-          <label className="agitator-type-label" htmlFor="agitator-type">Type</label>
-          <select
-            id="agitator-type"
-            className="agitator-type-select"
-            value={agitatorType}
-            onChange={(e) => handleTypeChange(e.target.value as AgitatorType)}
-          >
-            {AGITATOR_TYPE_OPTIONS.map((t) => (
-              <option key={t} value={t}>{t}</option>
-            ))}
-          </select>
-        </div>
       </section>
 
       <section className="panel calc-table-panel">
         <div className="calc-table-wrap">
-          <table className="calc-table agitator-table">
+          <table className="calc-table high-shear-mixer-table">
             <thead>
               <tr>
                 <th>Item</th>
@@ -213,33 +196,34 @@ export default function AgitatorCalculatorPage({ item }: Props) {
             </thead>
             <tbody>
               {lineItems.map((row) => (
-                  <tr key={row.id}>
-                    <td className="item-name" data-label="Item">{row.name}</td>
-                    <td className="variant-cell" data-label="Size">
-                      {renderSizeCell(row)}
-                    </td>
-                    <td className="param-cell" data-label="Ø">
-                      {renderDimCell(row, 'diameter', row.diameter)}
-                    </td>
-                    <td className="param-cell" data-label="L">
-                      {renderDimCell(row, 'length', row.length)}
-                    </td>
-                    <td className="param-cell" data-label="W">
-                      {renderDimCell(row, 'width', row.width)}
-                    </td>
-                    <td className="param-cell" data-label="THK">
-                      {renderDimCell(row, 'thickness', row.thickness)}
-                    </td>
-                    <td className="num" data-label="Result">{formatNum(row.result)}</td>
-                    <td className="rate-cell" data-label="Rate">
-                      <EditableNumberInput className="rate-input"
-                        value={row.rate}
-                        onChange={(v) => updateRate(row.id, v)}
-                      />
-                    </td>
-                    <td className="num" data-label="Total Amount">{formatCurrency(row.totalAmount)}</td>
-                  </tr>
-                ))}
+                <tr key={row.id}>
+                  <td className="item-name" data-label="Item">{row.name}</td>
+                  <td className="variant-cell" data-label="Size">
+                    {renderSizeCell(row)}
+                  </td>
+                  <td className="param-cell" data-label="Ø">
+                    {renderDimCell(row, 'diameter', row.diameter)}
+                  </td>
+                  <td className="param-cell" data-label="L">
+                    {renderDimCell(row, 'length', row.length)}
+                  </td>
+                  <td className="param-cell" data-label="W">
+                    {renderDimCell(row, 'width', row.width)}
+                  </td>
+                  <td className="param-cell" data-label="THK">
+                    {renderDimCell(row, 'thickness', row.thickness)}
+                  </td>
+                  <td className="num" data-label="Result">{formatNum(row.result)}</td>
+                  <td className="rate-cell" data-label="Rate">
+                    <EditableNumberInput
+                      className="rate-input"
+                      value={row.rate}
+                      onChange={(v) => updateRate(row.id, v)}
+                    />
+                  </td>
+                  <td className="num" data-label="Total Amount">{formatCurrency(row.totalAmount)}</td>
+                </tr>
+              ))}
               <tr className="total-row total-row-weight">
                 <td className="item-name"><strong>Total Weight</strong></td>
                 <td className="hide-mobile" colSpan={5} />
@@ -248,7 +232,7 @@ export default function AgitatorCalculatorPage({ item }: Props) {
                 <td className="hide-mobile" />
               </tr>
               <tr className="total-row total-row-amount">
-                <td className="item-name"><strong>Total Material Amount</strong></td>
+                <td className="item-name"><strong>Total Material Cost</strong></td>
                 <td className="hide-mobile" colSpan={5} />
                 <td className="hide-mobile" />
                 <td className="hide-mobile" />
@@ -262,19 +246,19 @@ export default function AgitatorCalculatorPage({ item }: Props) {
       <section className="panel summary-panel">
         <h2>Cost Summary</h2>
         <div className="summary-grid">
-          <SummaryRow label="Total Material Rate" value={totalMaterialAmount} />
+          <SummaryRow label="Total Material Cost" value={totalMaterialAmount} />
           <SummaryLabour percent={labourPercent} onPercentChange={setLabourPercent} value={labourCost} />
           <SummaryEditable label="Motor" value={motorCost} onChange={setMotorCost} />
-          <SummaryEditable label="Gearbox" value={gearboxCost} onChange={setGearboxCost} />
-          <SummaryEditable label="Seal" value={sealCost} onChange={setSealCost} />
+          <SummaryEditable label="Rotor" value={rotorCost} onChange={setRotorCost} />
+          <SummaryEditable label="Miscellaneous" value={miscCost} onChange={setMiscCost} />
           <SummaryProfit
             percent={profitPercent}
             onPercentChange={setProfitPercent}
             value={profitCost}
           />
           <div className="summary-row grand-total">
-            <span>Final Amount</span>
-            <span>{formatCurrency(finalAmount)}</span>
+            <span>Grand Total</span>
+            <span>{formatCurrency(grandTotal)}</span>
           </div>
         </div>
       </section>
@@ -306,7 +290,8 @@ function SummaryLabour({
         Labour
         <span className="labour-percent-wrap">
           (
-          <EditableNumberInput className="labour-percent-input"
+          <EditableNumberInput
+            className="labour-percent-input"
             value={percent}
             min={0}
             max={100}
@@ -336,7 +321,8 @@ function SummaryProfit({
         Profit
         <span className="labour-percent-wrap">
           (
-          <EditableNumberInput className="profit-percent-input"
+          <EditableNumberInput
+            className="profit-percent-input"
             value={percent}
             min={0}
             max={100}
@@ -363,7 +349,8 @@ function SummaryEditable({
   return (
     <div className="summary-row editable">
       <span>{label}</span>
-      <EditableNumberInput className="summary-input"
+      <EditableNumberInput
+        className="summary-input"
         value={value}
         onChange={(v) => onChange(v)}
       />
